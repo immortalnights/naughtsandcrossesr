@@ -1,0 +1,19 @@
+{
+  "name": "noughtsandcrossesserver",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev-start": "nodemon ."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "nodemon": "^1.19.3",
+    "redux": "^4.0.4",
+    "socket.io": "^2.3.0"
+  },
+  "devDependancies": {
+    "nodemon": "^1.19.3"
+  }
+}
