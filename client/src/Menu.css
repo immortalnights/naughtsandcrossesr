@@ -1,0 +1,9 @@
+
+.board {
+	height: 100px;
+}
+
+.cell {
+	min-width: 32px;
+	min-height: 32px;
+}
