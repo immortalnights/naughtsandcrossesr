@@ -2,6 +2,7 @@ import React from 'react';
 import Menu from './Menu';
 import Board from './Board';
 import Context from './socketio/Context';
+import { joinGame } from './sockets/emits';
 
 export default class Game extends React.Component {
 	static contextType = Context
@@ -14,6 +15,12 @@ export default class Game extends React.Component {
 		if (isConnected !== true)
 		{
 			content = (<div>Connecting...</div>);
+		}
+		else if (this.context.autoJoin)
+		{
+			console.log("Auto joining game", this.context.autoJoin);
+			content = (<p>Joining game...</p>);
+			joinGame(this.context.autoJoin);
 		}
 		else if (!this.context.game)
 		{

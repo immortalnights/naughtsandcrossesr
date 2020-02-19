@@ -13,12 +13,31 @@ export const socketEvents = ({ setValue }) => {
 		setValue(state => { return { ...state, game: null, token: null, connected: false } });
 	});
 
-	socket.on('joined', ({ game, token, cells }) => {
-		console.log("joined", game, token);
-		setValue(state => { return { ...state, game, token, ready: false } });
-	});
-
-	socket.on('positionInLine', ({ positionInLine }) => {
-		setValue(state => { return { ...state, positionInLine } });
+	socket.on('joined', ({ status, ...msg }) => {
+		console.log("joined", status);
+		switch (status)
+		{
+			case 'Success':
+			{
+				const { game, token, ready } = msg;
+				setValue(state => {
+					state = { ...state, game, token, ready };
+					delete state.error;
+					delete state.autoJoin;
+					return state;
+				});
+				break;
+			}
+			case 'Failed':
+			default:
+			{
+				setValue(state => {
+					state = { ...state, error: msg.reason, game: null, token: null, ready: false };
+					delete state.autoJoin;
+					return state;
+				});
+				break;
+			}
+		}
 	});
 };

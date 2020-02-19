@@ -1,8 +1,5 @@
 import React from 'react';
 
-const SocketIOContext = React.createContext({
-	connected: false,
-	game: null
-});
+const SocketIOContext = React.createContext({});
 
 export default SocketIOContext;

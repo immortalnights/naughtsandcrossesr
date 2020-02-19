@@ -4,8 +4,13 @@ import Context from './Context.js';
 import { initSockets } from '../sockets/';
 
 const SocketProvider = (props) => {
+	const params = new URLSearchParams(window.location.search);
+
 	const [value, setValue] = useState({
-		game: null
+		connected: false,
+		ready: false,
+		game: null,
+		autoJoin: params.get('game')
 	});
 
 	useEffect(() => initSockets({ setValue }), [initSockets]);
