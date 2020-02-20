@@ -1,6 +1,6 @@
 import React from 'react';
 import Game from './Game';
-import SocketIOProvider from './socketio/';
+import SocketIOProvider from './socketcontext/';
 import './App.css';
 
 class App extends React.Component {

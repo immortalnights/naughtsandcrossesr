@@ -1,36 +1,46 @@
-import React, { useState, useEffect } from 'react';
-import Context from './Context.js';
-// import openSocket from 'socket.io-client';
-import { initSockets } from '../sockets/';
+import io from 'socket.io-client';
+import { socketEvents } from './events';
 
-const SocketProvider = (props) => {
-	const params = new URLSearchParams(window.location.search);
+export const socket = io('http://' + window.location.hostname + ':3001', {
+	autoConnect: false
+});
 
-	const [value, setValue] = useState({
-		connected: false,
-		ready: false,
-		game: null,
-		autoJoin: params.get('game')
-	});
-
-	useEffect(() => initSockets({ setValue }), [initSockets]);
-
-	return(
-		<Context.Provider value={ value }>
-			{ props.children }
-		</Context.Provider>
-	)
+export const initSockets = ({ setValue }) => {
+	socketEvents({ socket, setValue });
+	socket.open();
 };
 
-export default SocketProvider;
+// socket.on('connect', () => {
+// 	console.log('connected', socket.id);
+// });
 
-// export default class SocketIOProvider extends React.Component {
-//  static contextType = Context
+// socket.on('disconnect', () => {
+// 	console.log('disconnected');
+// });
 
-//  render()
-//  {
-//    return (<Context.Provider value={{}}>
-//        {this.props.children}
-//      </Context.Provider>);
-//  }
-// }
+
+		// socket.on('message', (msg, data) => {
+		//  console.log(`received '${msg}'`);
+
+		//  switch (msg)
+		//  {
+		//    case 'state':
+		//    {
+		//      console.log(data);
+		//      this.setState({
+		//        cells: data.cells,
+		//        observer: data.observer,
+		//        status: 'ok'
+		//      });
+		//      break;
+		//    }
+		//  }
+		// });
+
+		// this.state = {
+		//  cells: [],
+		//  status: 'loading',
+		//  io: socket
+		// };
+
+		// socket.send('load');
