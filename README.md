@@ -1,2 +1,2 @@
-# naughtsandcrossesr
-React built naughts and crosses
+# noughtsandcrossesr
+React built Noughts and Crosses
