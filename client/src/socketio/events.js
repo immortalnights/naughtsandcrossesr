@@ -29,7 +29,7 @@ export const socketEvents = ({ setValue }) => {
 
 		setTimeout(() => {
 			setValue(state => {
-				state = { ...state, state: 'CONNECTED' }
+				state = { ...state, state: 'CONNECTED' };
 				delete state.reason;
 				delete state.winner;
 
@@ -39,8 +39,12 @@ export const socketEvents = ({ setValue }) => {
 	});
 
 	socket.on('start_game', ({ cells, ...msg }) => {
-		console.log("Starting game", msg);
-		setValue(state => { return { ...state, cells, state: 'PLAYING' } });
+		console.log("Starting game", cells, msg);
+		setValue(state => {
+
+			cells = cells.map((c, i) => { return { id: i, t: c }; });
+			return { ...state, cells, state: 'PLAYING' }
+		});
 	});
 
 	socket.on('end_game', ({ reason, winner, ...msg }) => {
@@ -49,7 +53,7 @@ export const socketEvents = ({ setValue }) => {
 
 		setTimeout(() => {
 			setValue(state => {
-				state = { ...state, state: 'CONNECTED' }
+				state = { ...state, state: 'CONNECTED' };
 				delete state.reason;
 				delete state.winner;
 
@@ -58,31 +62,13 @@ export const socketEvents = ({ setValue }) => {
 		}, 2000);
 	});
 
-	socket.on('joined', ({ status, ...msg }) => {
-		console.log("joined", status);
-		switch (status)
-		{
-			case 'Success':
-			{
-				const { game, token, ready } = msg;
-				setValue(state => {
-					state = { ...state, game, token, ready };
-					delete state.error;
-					delete state.autoJoin;
-					return state;
-				});
-				break;
-			}
-			case 'Failed':
-			default:
-			{
-				setValue(state => {
-					state = { ...state, error: msg.reason, game: null, token: null, ready: false };
-					delete state.autoJoin;
-					return state;
-				});
-				break;
-			}
-		}
+	socket.on('token_placed', ({ cell, token, ...msg }) => {
+		console.log("token placed", cell, token);
+		setValue(state => {
+			state = { ...state };
+			state.cells = { ...state.cells };
+			state.cells[cell].t = token;
+			return state;
+		});
 	});
 };

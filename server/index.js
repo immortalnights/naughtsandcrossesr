@@ -48,6 +48,15 @@ class Game {
 		this.cells = new Array(3 * 3).fill('');
 	}
 
+	place(token, cell)
+	{
+		console.log(`Placing ${token} in cell ${cell}`);
+		this.cells[cell] = token;
+
+		// this.players.forEach((player) => player.io.emit('token_placed', { calls: this.cells }));
+		this.players.forEach((player) => player.io.emit('token_placed', { cell, token }));
+	}
+
 	join(p, asHost)
 	{
 		console.log(`Game ${this.id} has ${this.players.length} players`);
@@ -101,6 +110,7 @@ class Player {
 
 		this.io.on('host_game', this.onHostGame.bind(this));
 		this.io.on('join_game', this.onJoinGame.bind(this));
+		this.io.on('place_token', this.onPlaceToken.bind(this));
 		this.io.on('disconnect', this.onDisconnected.bind(this));
 	}
 
@@ -144,7 +154,7 @@ class Player {
 		this.io.emit('end_game', msg);
 	}
 
-	onJoinGame({id, ...msg})
+	onJoinGame({ id, ...msg })
 	{
 		console.debug(`Client ${this.id} attempting to join ${id}`);
 
@@ -160,6 +170,18 @@ class Player {
 		{
 			console.log(`Game ${id} does not exist`);
 			this.io.emit('join_failed', { reason: "Game does not exist." });
+		}
+	}
+
+	onPlaceToken({ cell, ...msg })
+	{
+		if (this.game)
+		{
+			this.game.place(this.token, cell);
+		}
+		else
+		{
+			console.warn("Player ${this.id} is not in a game");
 		}
 	}
 

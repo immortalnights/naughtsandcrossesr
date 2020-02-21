@@ -7,3 +7,7 @@ export const hostGame = () => {
 export const joinGame = (game) => {
 	socket.emit('join_game', { id: game });
 };
+
+export const placeToken = (cell) => {
+	socket.emit('place_token', { cell });
+};

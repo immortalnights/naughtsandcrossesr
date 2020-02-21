@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { placeToken } from '../../socketio/emits';
 
 export default class Cell extends React.Component {
 	static propTypes = {
@@ -8,6 +9,8 @@ export default class Cell extends React.Component {
 
 	constructor(props) {
 		super(props);
+
+		console.log("CELL", props);
 
 		this.state = {
 			active: false,
@@ -37,7 +40,9 @@ export default class Cell extends React.Component {
 		// console.log(`left cell ${this.props.id}`);
 	}
 
-	render() {
+	render()
+	{
+		console.log("render cell", this.props.id);
 		let className = ['cell'];
 		if (this.state.active)
 		{
@@ -51,9 +56,10 @@ export default class Cell extends React.Component {
 			}
 		}
 
-		const onClick = this.props.onClick ? this.props.onClick.bind(null, this) : null;
+		const onClick = placeToken.bind(null, this.props.id);
+		// this.props.onClick ? this.props.onClick.bind(null, this) : null;
 		const value = this.props.token || '&nbsp;';
 
-		return (<td className={className.join(' ')} onClick={onClick} onMouseOver={this.handleMouseOver} onMouseLeave={this.handleMouseLeave}>{}</td>);
+		return (<td className={className.join(' ')} onClick={onClick} onMouseOver={this.handleMouseOver} onMouseLeave={this.handleMouseLeave}>{this.props.t}</td>);
 	}
 }
