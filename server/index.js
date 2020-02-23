@@ -46,15 +46,50 @@ class Game {
 		this.id = uuid();
 		this.players = [];
 		this.cells = new Array(3 * 3).fill('');
+		this.turn = 0;
 	}
 
-	place(token, cell)
+	place(player, cell)
 	{
-		console.log(`Placing ${token} in cell ${cell}`);
-		this.cells[cell] = token;
+		console.log(`${player.id} placing ${player.token} in cell ${cell}`);
 
-		// this.players.forEach((player) => player.io.emit('token_placed', { calls: this.cells }));
-		this.players.forEach((player) => player.io.emit('token_placed', { cell, token }));
+		const target = this.cells[cell];
+		const activePlayer = this.players[this.turn];
+
+		if (activePlayer !== player)
+		{
+			console.log("Invalid move: Not players turn");
+			player.io.emit('invalid_move', { reason: "It is not your turn." });
+		}
+		else if (target)
+		{
+			console.log("Invalid move: Cell already taken");
+			player.io.emit('invalid_move', { reason: "Cannot place token there." });
+		}
+		else
+		{
+			this.cells[cell] = player.token;
+
+			// emit to all players
+			this.players.forEach((p) => p.io.emit('token_placed', { cell, token: player.token }));
+
+			const winner = this.checkForEndOfGame(this.cells);
+			if (winner)
+			{
+				if (winner === 'draw')
+				{
+					this.players.forEach((p) => { p.endGame({ reason: `Game ended as a draw`, winner: false }); });
+				}
+				else
+				{
+					this.players.forEach((p) => { p.endGame({ reason: `Player ${winner} has won`, winner: winner }); });
+				}
+			}
+			else
+			{
+				this.turn = this.nextTurn(this.turn);
+			}
+		}
 	}
 
 	join(p, asHost)
@@ -74,7 +109,10 @@ class Game {
 			if (this.players.length === 2)
 			{
 				console.log(`Starting game ${this.id}`);
-				this.players.forEach((player) => player.startGame());
+
+				this.turn = this.players.findIndex((player) => { return player.token === 'x'; });
+
+				this.players.forEach((player) => player.startGame(this.players[this.turn].token));
 			}
 		}
 		else
@@ -98,6 +136,97 @@ class Game {
 			console.warn(`Client ${p.id} does not exist in game ${this.id}`);
 		}
 	}
+
+	nextTurn(currentTurn)
+	{
+		console.debug(currentTurn, this.players.length);
+
+		++currentTurn;
+		if (currentTurn >= this.players.length)
+		{
+			currentTurn = 0;
+		}
+
+		console.debug(currentTurn);
+
+		return currentTurn;
+	}
+
+	checkForEndOfGame(cells)
+	{
+		const wins = [
+			[1, 0, 0,
+			 0, 1, 0,
+			 0, 0, 1],
+			[0, 0, 1,
+			 0, 1, 0,
+			 1, 0, 0],
+			[1, 1, 1,
+			 0, 0, 0,
+			 0, 0, 0],
+			[0, 0, 0,
+			 1, 1, 1,
+			 0, 0, 0],
+			[0, 0, 0,
+			 0, 0, 0,
+			 1, 1, 1],
+			[1, 0, 0,
+			 1, 0, 0,
+			 1, 0, 0],
+			[0, 1, 0,
+			 0, 1, 0,
+			 0, 1, 0],
+			[0, 0, 1,
+			 0, 0, 1,
+			 0, 0, 1],
+		];
+
+		let winner = null;
+		wins.some((set) => {
+			// console.log(set);
+			let token = undefined;
+			const hasWinner = set.every((cell, index) => {
+				// console.log(cell, index);
+				let r = false;
+				if (!cell)
+				{
+					r = true;
+				}
+				else if (!token && cells[index])
+				{
+					token = cells[index];
+					// console.log(index, '=>', token);
+					r = true;
+				}
+				else if (token && cells[index] === token)
+				{
+					// console.log(index, '=>', token);
+					r = true;
+				}
+
+				return r;
+			});
+
+			if (hasWinner)
+			{
+				winner = token;
+			}
+
+			return hasWinner;
+		});
+
+		if (!winner)
+		{
+			const full = cells.every((c) => !!c);
+			if (full)
+			{
+				winner = 'draw';
+				console.log(`Board is full`);
+			}
+		}
+
+		return winner;
+	}
 }
 
 class Player {
@@ -116,7 +245,6 @@ class Player {
 
 	onHostGame()
 	{
-		console.log(this.game)
 		if (this.game === null)
 		{
 			console.debug(`Client ${this.id} is hosting a new game`);
@@ -140,9 +268,9 @@ class Player {
 		this.io.emit('joined_game', { id: this.game.id, host: this.host, token: this.token });
 	}
 
-	startGame()
+	startGame(turnToken)
 	{
-		this.io.emit('start_game', { cells: this.game.cells });
+		this.io.emit('start_game', { cells: this.game.cells, turn: turnToken });
 	}
 
 	endGame({ ...msg })
@@ -177,7 +305,7 @@ class Player {
 	{
 		if (this.game)
 		{
-			this.game.place(this.token, cell);
+			this.game.place(this, cell);
 		}
 		else
 		{
