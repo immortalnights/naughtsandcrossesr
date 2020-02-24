@@ -1,6 +1,7 @@
 import React from 'react';
 import Menu from './components/menu/';
 import Board from './components/board';
+import Header from './components/header/';
 import Context from './socketcontext/Context';
 import { joinGame, leaveGame } from './socketio/emits';
 
@@ -65,7 +66,10 @@ export default class Game extends React.Component {
 			}
 			case 'PLAYING':
 			{
-				content = (<Board cells={this.context.cells} />);
+				content = (<>
+					<Header />
+					<Board cells={this.context.cells} />
+				</>);
 				break;
 			}
 			case 'ENDED':

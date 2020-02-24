@@ -38,12 +38,12 @@ export const socketEvents = ({ setValue }) => {
 		}, 2000);
 	});
 
-	socket.on('start_game', ({ cells, ...msg }) => {
-		console.log("Starting game", cells, msg);
+	socket.on('start_game', ({ cells, turn, ...msg }) => {
+		console.log("Starting game", cells, turn, msg);
 		setValue(state => {
 
 			cells = cells.map((c, i) => { return { id: i, t: c }; });
-			return { ...state, cells, state: 'PLAYING' }
+			return { ...state, cells, turn, state: 'PLAYING' }
 		});
 	});
 
@@ -70,5 +70,10 @@ export const socketEvents = ({ setValue }) => {
 			state.cells[cell].t = token;
 			return state;
 		});
+	});
+
+	socket.on('next_turn', ({ turn, ...msg }) => {
+		console.log("next turn", turn);
+		setValue(state => { return { ...state, turn }; });
 	});
 };

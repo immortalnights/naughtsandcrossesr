@@ -10,7 +10,7 @@ class App extends React.Component {
 
 	render() {
 		return (
-			<div className="flex-container flex-center">
+			<div className="flex-container flex-vertical flex-center">
 				<SocketIOProvider>
 					<Game />
 				</SocketIOProvider>
