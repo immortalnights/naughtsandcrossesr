@@ -1,8 +1,6 @@
 const uuid = require('uuid/v1');
 
-
-module.exports = class Game
-{
+module.exports = class Game {
 	constructor(options)
 	{
 		this.id = uuid();
@@ -10,6 +8,7 @@ module.exports = class Game
 		this.cells = new Array(3 * 3).fill('');
 		this.turn = 0;
 
+		this.io = options.io;
 		this.onClose = options.onClose;
 	}
 
@@ -61,11 +60,13 @@ module.exports = class Game
 			const tokens = ['x', 'o'];
 			const token = tokens[this.players.length - 1];
 
+			p.io.join(this.id);
+
 			// update the new players game data
 			p.joinedGame({ game: this, host: asHost, token });
 
 			// tell all current players that a new player has joined
-			this.broadcast('player_joined', { token: p.token });
+			p.io.broadcast.to(this.id).emit('player_joined', { token: p.token });
 
 			// tell the player they they have joined successfully
 			p.io.emit('joined_game', { id: this.id, host: asHost, token: p.token });
@@ -131,9 +132,10 @@ module.exports = class Game
 
 	broadcast(name, msg)
 	{
-		this.players.forEach((player) => {
-			player.io.emit(name, msg)
-		});
+		this.io.to(this.id).emit(name, msg);
+		// this.players.forEach((player) => {
+		// 	player.io.emit(name, msg)
+		// });
 	}
 
 	nextTurn(currentTurn)

@@ -13,6 +13,10 @@ export const socketEvents = ({ setValue }) => {
 		setValue(state => { return { ...state, game: null, token: null, state: 'DISCONNECTED' } });
 	});
 
+	socket.on('lobby_ping', () => {
+		console.log("lobby_ping", socket.id);
+	});
+
 	socket.on('game_created', ({ id, ...msg }) => {
 		console.log("Created game", id, msg);
 		setValue(state => { return { ...state, state: 'JOINING_GAME' } });
