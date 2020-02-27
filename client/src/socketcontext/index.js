@@ -9,6 +9,9 @@ const SocketProvider = (props) => {
 		state: 'DISCONNECTED',
 		connected: false,
 		ready: false,
+		test: 1,
+		games: [],
+		players: [],
 		game: params.get('game')
 	});
 

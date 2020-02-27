@@ -34,22 +34,41 @@ module.exports = class Lobby {
 	{
 		console.log(`Client connected ${client.id}`);
 
-		const p = new this.Player(client);
-		this.players.push(p);
 
-		client.join('lobby')
-		.on('host_game', this.onHostGame.bind(this, p))
-		.on('join_game', this.onJoinGame.bind(this, p))
-		.on('disconnect', this.onDisconnected.bind(this, p));
+		// create the client (TODO should be done outside the lobby)
+		const player = new this.Player(client);
+		// Add the lobby list
+		this.players.push(player);
+
+		// join the lobby channel
+		client.join('lobby');
+
+		// send the client all the games and players
+		player.io.emit('lobby_details', {
+			players: this.players.map(p => { return { id: p.id }; }),
+			games: this.games.map(g => { return { id: g.id }; }),
+		});
+
+		// inform existing players that a new player has joined
+		player.io.to('lobby').emit('lobby_player_joined', {
+			player: { id: player.id }
+		});
 
 		// listen to client socket events
-		// client.on('host_game', this.onHostGame.bind(this, p));
-		// client.on('join_game', this.onJoinGame.bind(this, p));
-		// client.on('disconnect', this.onDisconnected.bind(this, p));
+		client.on('host_game', this.onHostGame.bind(this, player));
+		client.on('join_game', this.onJoinGame.bind(this, player));
+		client.on('disconnect', this.onDisconnected.bind(this, player));
 	}
 
 	leave(player)
 	{
+		console.log(`Player ${player.id} is leaving the lobby`);
+
+		// inform all other players that a player has left
+		player.io.to('lobby').emit('lobby_player_left', {
+			id: player.id
+		});
+
 		player.io.leave('lobby');
 
 		// stop listening to client socket events
@@ -84,7 +103,7 @@ module.exports = class Lobby {
 		console.debug(`Game ${game.id} is closing`);
 		const index = this.games.indexOf(game);
 		this.games.splice(index, 1);
-		this.broadcast('game_closed', { id: game.id });
+		this.broadcast('lobby_game_closed', { id: game.id });
 	}
 
 	onHostGame(player)
@@ -92,11 +111,10 @@ module.exports = class Lobby {
 		console.debug(`Player ${player.id} attempting to host a new game`);
 
 		const game = this.host();
-		this.broadcast('game_created', { id: game.id });
+		this.broadcast('lobby_game_created', { game: { id: game.id } });
 
+		this.leave(player);
 		game.join(player, true);
-
-		this.games.push(game);
 	}
 
 	onJoinGame(player, { id })
@@ -109,6 +127,7 @@ module.exports = class Lobby {
 
 		if (game)
 		{
+			this.leave(player);
 			game.join(player, false);
 		}
 		else

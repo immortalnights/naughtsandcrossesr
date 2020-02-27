@@ -13,6 +13,57 @@ export const socketEvents = ({ setValue }) => {
 		setValue(state => { return { ...state, game: null, token: null, state: 'DISCONNECTED' } });
 	});
 
+	socket.on('lobby_details', ({players, games}) => {
+		console.log("lobby details", players, games);
+		setValue(state => { return { ...state, players, games } });
+	});
+
+	socket.on('lobby_player_joined', ({player}) => {
+		console.log('lobby_player_joined', player);
+		setValue(state => {
+			state = { ...state };
+			state.players = [...state.players];
+			state.players.push(player);
+			return state;
+		});
+	});
+
+	socket.on('lobby_player_left', (player) => {
+		console.log('lobby_player_left', player);
+		setValue(state => {
+			state = { ...state };
+			state.players = [...state.players];
+			const index = state.players.findIndex((p) => {
+				return p.id === player.id;
+			});
+			state.players.splice(index, 1);
+			return state
+		});
+	});
+
+	socket.on('lobby_game_created', ({game}) => {
+		console.log('lobby_game_created', game);
+		setValue(state => {
+			state = { ...state };
+			state.games = [...state.games];
+			state.games.push(game);
+			return state;
+		});
+	});
+
+	socket.on('lobby_game_closed', (game) => {
+		console.log('lobby_game_closed', game);
+		setValue(state => {
+			state = { ...state };
+			state.games = [...state.games];
+			const index = state.games.findIndex((g) => {
+				return g.id === game.id;
+			});
+			state.games.splice(index, 1);
+			return state
+		});
+	});
+
 	socket.on('lobby_ping', () => {
 		console.log("lobby_ping", socket.id);
 	});
