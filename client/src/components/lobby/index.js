@@ -35,9 +35,6 @@ export default class Lobby extends React.Component {
 				<GamesList games={this.context.games} />
 			</div>
 			<div>
-				<h4>Players {this.context.players.length}</h4>
-			</div>
-			<div>
 				<button className="button" onClick={this.onHost.bind(this)}>Host</button>
 				<button className="button" onClick={update}>Test</button>
 			</div>

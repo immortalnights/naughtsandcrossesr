@@ -1,47 +1,20 @@
-const http = require('http');
-const SocketIO = require('socket.io');
 const uuid = require('uuid/v1');
 
 module.exports = class Lobby {
 	constructor(options)
 	{
-		this.io = null;
+		this.io = options.io;
 		this.players = [];
 		this.games = [];
-
-		this.Player = options.player;
-		this.Game = options.game;
 	}
 
-	start(port = 3001)
+	join(player)
 	{
-		const server = http.createServer();
-		this.io = new SocketIO(server);
-
-		server.listen({
-			port: port,
-			host: '0.0.0.0'
-		});
-
-		this.io.on('connection', this.onJoin.bind(this));
-
-		setInterval(() => {
-			this.broadcast('lobby_ping');
-		}, 1000);
-	}
-
-	onJoin(client)
-	{
-		console.log(`Client connected ${client.id}`);
-
-
-		// create the client (TODO should be done outside the lobby)
-		const player = new this.Player(client);
 		// Add the lobby list
 		this.players.push(player);
 
 		// join the lobby channel
-		client.join('lobby');
+		player.io.join('lobby');
 
 		// send the client all the games and players
 		player.io.emit('lobby_details', {
@@ -55,9 +28,9 @@ module.exports = class Lobby {
 		});
 
 		// listen to client socket events
-		client.on('host_game', this.onHostGame.bind(this, player));
-		client.on('join_game', this.onJoinGame.bind(this, player));
-		client.on('disconnect', this.onDisconnected.bind(this, player));
+		player.io.on('host_game', this.onHostGame.bind(this, player));
+		player.io.on('join_game', this.onJoinGame.bind(this, player));
+		player.io.on('disconnect', this.onDisconnected.bind(this, player));
 	}
 
 	leave(player)
@@ -89,13 +62,13 @@ module.exports = class Lobby {
 	}
 
 	// host a game
-	host()
-	{
-		const game = new this.Game({ onClose: this.close.bind(this), io: this.io });
-		this.games.push(game);
-		console.debug(`Created game ${game.id} (${this.games.length})`);
-		return game;
-	}
+	// host()
+	// {
+	// 	const game = new this.Game({ onClose: this.close.bind(this), io: this.io });
+	// 	this.games.push(game);
+	// 	console.debug(`Created game ${game.id} (${this.games.length})`);
+	// 	return game;
+	// }
 
 	// close a game
 	close(game)
@@ -111,6 +84,7 @@ module.exports = class Lobby {
 		console.debug(`Player ${player.id} attempting to host a new game`);
 
 		const game = this.host();
+		this.games.push(game);
 		this.broadcast('lobby_game_created', { game: { id: game.id } });
 
 		this.leave(player);
