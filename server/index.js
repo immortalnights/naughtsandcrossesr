@@ -14,18 +14,30 @@ server.listen({
 	host: '0.0.0.0'
 });
 
-const lobby = new Lobby({io});
+const onCreateGame = (player) => {
+	const game = new Game({ io });
+	console.debug(`Created game ${game.id}`);
+	return game;
+}
+
+const lobby = new Lobby({ io, onCreateGame });
 
 io.on('connection', (client) => {
 	console.log(`Client connected ${client.id}`);
 
 	const player = new Player(client);
+
+	player.on('enter_game', () => {
+		// remove player from lobby
+	});
+
+	player.on('leave_game', () => {
+		// add player to lobby
+	});
+
+	player.on('leave_game', () => {
+		// remove player from lobby
+	});
+
 	lobby.join(player);
 });
-
-// maybe lobby.'host_game'?
-lobby.host = function() {
-	const game = new Game({ onClose: this.close.bind(this), io: this.io });
-	console.debug(`Created game ${game.id} (${this.games.length})`);
-	return game;
-}

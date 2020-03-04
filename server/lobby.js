@@ -6,6 +6,8 @@ module.exports = class Lobby {
 		this.io = options.io;
 		this.players = [];
 		this.games = [];
+
+		this.onCreateGame = options.onCreateGame;
 	}
 
 	join(player)
@@ -61,15 +63,6 @@ module.exports = class Lobby {
 		});
 	}
 
-	// host a game
-	// host()
-	// {
-	// 	const game = new this.Game({ onClose: this.close.bind(this), io: this.io });
-	// 	this.games.push(game);
-	// 	console.debug(`Created game ${game.id} (${this.games.length})`);
-	// 	return game;
-	// }
-
 	// close a game
 	close(game)
 	{
@@ -83,12 +76,12 @@ module.exports = class Lobby {
 	{
 		console.debug(`Player ${player.id} attempting to host a new game`);
 
-		const game = this.host();
+		const game = this.onCreateGame(player);
 		this.games.push(game);
-		this.broadcast('lobby_game_created', { game: { id: game.id } });
+		this.broadcast('lobby_game_created', { game: game.toJSON() });
 
-		this.leave(player);
-		game.join(player, true);
+		// this.leave(player);
+		// game.join(player, true);
 	}
 
 	onJoinGame(player, { id })
