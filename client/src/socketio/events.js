@@ -13,8 +13,14 @@ export const socketEvents = ({ setValue }) => {
 		setValue(state => { return { ...state, game: null, token: null, state: 'DISCONNECTED' } });
 	});
 
+	socket.on('change_state', ({ state }) => {
+		const playerState = state;
+		console.log("change_state", socket.id, playerState);
+		setValue(state => { return { ...state, state: playerState } });
+	});
+
 	socket.on('lobby_details', ({players, games}) => {
-		console.log("lobby details", players, games);
+		console.log("lobby details: players", players, "games", games);
 		setValue(state => { return { ...state, players, games } });
 	});
 
@@ -51,6 +57,19 @@ export const socketEvents = ({ setValue }) => {
 		});
 	});
 
+	socket.on('lobby_game_updated', ({game}) => {
+		console.log('lobby_game_updated', game);
+		setValue(state => {
+			state = { ...state };
+			state.games = [...state.games];
+
+			let index = state.games.findIndex((g) => { return g.id === game.id });
+			state.games[index] = { ...state.games[index], game };
+
+			return state;
+		});
+	});
+
 	socket.on('lobby_game_closed', (game) => {
 		console.log('lobby_game_closed', game);
 		setValue(state => {
@@ -64,27 +83,23 @@ export const socketEvents = ({ setValue }) => {
 		});
 	});
 
-	socket.on('lobby_ping', () => {
-		console.log("lobby_ping", socket.id);
-	});
-
 	socket.on('game_created', ({ id, ...msg }) => {
 		console.log("Created game", id, msg);
-		setValue(state => { return { ...state, state: 'JOINING_GAME' } });
+		setValue(state => { return { ...state, oldstate: 'JOINING_GAME' } });
 	});
 
 	socket.on('joined_game', ({ id, host, token, ...msg }) => {
 		console.log("Joined game", id, host, token, msg);
-		setValue(state => { return { ...state, game: id, token, host, state: 'WAITING_FOR_OPPONENT' } });
+		setValue(state => { return { ...state, game: id, token, host, oldstate: 'WAITING_FOR_OPPONENT' } });
 	});
 
 	socket.on('join_failed', ({ reason, ...msg }) => {
 		console.log("Join game failed", reason);
-		setValue(state => { return { ...state, reason, game: null, cells: null, state: 'JOIN_FAILED' } });
+		setValue(state => { return { ...state, reason, game: null, cells: null, oldstate: 'JOIN_FAILED' } });
 
 		setTimeout(() => {
 			setValue(state => {
-				state = { ...state, state: 'CONNECTED' };
+				state = { ...state, oldstate: 'CONNECTED' };
 				delete state.reason;
 				delete state.winner;
 
@@ -98,17 +113,17 @@ export const socketEvents = ({ setValue }) => {
 		setValue(state => {
 
 			cells = cells.map((c, i) => { return { id: i, t: c }; });
-			return { ...state, cells, turn, state: 'PLAYING' }
+			return { ...state, cells, turn, oldstate: 'PLAYING' }
 		});
 	});
 
 	socket.on('end_game', ({ reason, winner, ...msg }) => {
 		console.log("Ended game", reason, winner, msg);
-		setValue(state => { return { ...state, reason, winner, game: null, cells: null, state: 'ENDED' } });
+		setValue(state => { return { ...state, reason, winner, game: null, cells: null, oldstate: 'ENDED' } });
 
 		setTimeout(() => {
 			setValue(state => {
-				state = { ...state, state: 'CONNECTED' };
+				state = { ...state, oldstate: 'CONNECTED' };
 				delete state.reason;
 				delete state.winner;
 

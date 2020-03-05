@@ -25,19 +25,26 @@ const lobby = new Lobby({ io, onCreateGame });
 io.on('connection', (client) => {
 	console.log(`Client connected ${client.id}`);
 
-	const player = new Player(client);
+	const player = new Player({ io: client });
 
 	player.on('enter_game', () => {
+		console.debug(`Player event 'enter_game'`);
 		// remove player from lobby
+		lobby.leave(player);
 	});
 
 	player.on('leave_game', () => {
+		console.debug(`Player event 'leave_game'`);
 		// add player to lobby
+		lobby.join(player);
 	});
 
-	player.on('leave_game', () => {
+	player.on('disconnect', () => {
+		console.debug(`Player event 'disconnect'`);
 		// remove player from lobby
+		lobby.leave(player);
 	});
 
+	// auto join the lobby
 	lobby.join(player);
 });

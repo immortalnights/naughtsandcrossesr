@@ -10,19 +10,28 @@ module.exports = class Lobby {
 		this.onCreateGame = options.onCreateGame;
 	}
 
+	serialize()
+	{
+		return {
+			players: this.players.map(p => p.serialize()),
+			games: this.games.map(g => g.serialize()),
+		};
+	}
+
 	join(player)
 	{
+		console.log(`Player ${player.id} is joining the lobby`);
+
 		// Add the lobby list
 		this.players.push(player);
 
 		// join the lobby channel
 		player.io.join('lobby');
 
+		player.setState('IN_LOBBY');
+
 		// send the client all the games and players
-		player.io.emit('lobby_details', {
-			players: this.players.map(p => { return { id: p.id }; }),
-			games: this.games.map(g => { return { id: g.id }; }),
-		});
+		// this.broadcast('lobby_details', this.serialize());
 
 		// inform existing players that a new player has joined
 		player.io.to('lobby').emit('lobby_player_joined', {
@@ -32,19 +41,22 @@ module.exports = class Lobby {
 		// listen to client socket events
 		player.io.on('host_game', this.onHostGame.bind(this, player));
 		player.io.on('join_game', this.onJoinGame.bind(this, player));
-		player.io.on('disconnect', this.onDisconnected.bind(this, player));
+		// player.io.on('disconnect', this.onDisconnected.bind(this, player));
 	}
 
 	leave(player)
 	{
 		console.log(`Player ${player.id} is leaving the lobby`);
 
+		player.io.leave('lobby');
+
 		// inform all other players that a player has left
 		player.io.to('lobby').emit('lobby_player_left', {
 			id: player.id
 		});
 
-		player.io.leave('lobby');
+		// send the client all the games and players
+		// this.broadcast('lobby_details', this.serialize());
 
 		// stop listening to client socket events
 		player.io.removeAllListeners('host_game');
@@ -68,6 +80,7 @@ module.exports = class Lobby {
 	{
 		console.debug(`Game ${game.id} is closing`);
 		const index = this.games.indexOf(game);
+		game.removeAllListeners('change');
 		this.games.splice(index, 1);
 		this.broadcast('lobby_game_closed', { id: game.id });
 	}
@@ -77,8 +90,12 @@ module.exports = class Lobby {
 		console.debug(`Player ${player.id} attempting to host a new game`);
 
 		const game = this.onCreateGame(player);
+		game.on('change', function() {
+			this.broadcast('lobby_game_updated', { game: this.serialize() });
+		});
+
 		this.games.push(game);
-		this.broadcast('lobby_game_created', { game: game.toJSON() });
+		this.broadcast('lobby_game_created', { game: game.serialize() });
 
 		// this.leave(player);
 		// game.join(player, true);
@@ -86,7 +103,7 @@ module.exports = class Lobby {
 
 	onJoinGame(player, { id })
 	{
-		console.debug(`Player ${this.id} attempting to join ${id}`);
+		console.debug(`Player ${player.id} attempting to join ${id}`);
 
 		const game = this.games.find((g) => {
 			return g.id === id;
@@ -94,8 +111,9 @@ module.exports = class Lobby {
 
 		if (game)
 		{
-			this.leave(player);
 			game.join(player, false);
+
+			this.broadcast('lobby_details', this.serialize());
 		}
 		else
 		{

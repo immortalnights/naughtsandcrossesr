@@ -8,6 +8,21 @@ module.exports = class NaughtsAndCrossesGame extends TurnBasedGame {
 		this.cells = new Array(3 * 3).fill('');
 	}
 
+	nonmame()
+	{
+
+			const tokens = ['x', 'o'];
+			const token = tokens[this.players.length - 1];
+			if (this.players.length === 2)
+			{
+				console.log(`Starting game ${this.id}`);
+
+				this.turn = this.players.findIndex((player) => { return player.token === 'x'; });
+
+				this.broadcast('start_game', { cells: this.cells, turn: this.players[this.turn].token });
+			}
+	}
+
 	place(player, cell)
 	{
 		console.log(`${player.id} placing ${player.token} in cell ${cell}`);

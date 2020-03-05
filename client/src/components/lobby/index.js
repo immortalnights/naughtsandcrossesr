@@ -6,15 +6,20 @@ import './lobby.css';
 class GamesList extends React.Component {
 	render()
 	{
+		const onClickJoin = (event) => {
+			joinGame(event.target.value);
+		}
+
 		const items = this.props.games.map((item) => {
 			console.log("game", item);
-			return (<div key={item.id}>
-				<div>Game</div>
-				<div><button type="button">Join</button></div>
+			return (<div key={item.id} className="game-item flex-container">
+				<div>Game {item.id}</div>
+				<div>{item.players.length}</div>
+				<div className="action-column"><button type="button" onClick={onClickJoin} name="join" value={item.id}>Join</button></div>
 			</div>);
 		});
 
-		return (<div>{items}</div>);
+		return (<div className="game-list">{items}</div>);
 	}
 }
 
@@ -29,16 +34,13 @@ export default class Lobby extends React.Component {
 			this.props.changeState(++this.context.test);
 		}
 
-		return (<>
-			<div>
-				<h4>Available Games</h4>
-				<GamesList games={this.context.games} />
+		return (<div className="lobby-container">
+			<h4>Available Games</h4>
+			<GamesList games={this.context.games} />
+			<div className="controls" style={{textAlign: 'center'}}>
+				<button className="button" onClick={this.onHost.bind(this)}>New Game</button>
 			</div>
-			<div>
-				<button className="button" onClick={this.onHost.bind(this)}>Host</button>
-				<button className="button" onClick={update}>Test</button>
-			</div>
-		</>);
+		</div>);
 	}
 
 	onHost()

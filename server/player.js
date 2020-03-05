@@ -8,6 +8,7 @@ module.exports = class Player extends EventEmitter {
 
 		this.id = uuid();
 		this.io = options.io;
+		this.state = 'CONNECTED';
 		this.game = null;
 
 		this.io.on('leave_game', this.onLeaveGame.bind(this));
@@ -20,6 +21,13 @@ module.exports = class Player extends EventEmitter {
 		return { id: this.id };
 	}
 
+	setState(state)
+	{
+		console.debug(`${this.id} ${this.state} => ${state}`);
+		this.state = state;
+		this.io.emit('change_state', { state });
+	}
+
 	// send a message directly to this player
 	send(name, msg)
 	{
@@ -27,18 +35,18 @@ module.exports = class Player extends EventEmitter {
 	}
 
 	// entered a game
-	onEnteredGame({ game, ...msg })
+	enteredGame({ game, ...msg })
 	{
 		this.game = game;
-		this.token = token;
-
 		this.emit('enter_game');
+
+		this.setState('IN_GAME_LOBBY');
 	}
 
 	// leave a game
 	onLeaveGame()
 	{
-		console.assert(this.game, "Player is not in a game!");
+		console.assert(this.game, `Player ${this.id} is not in a game!`);
 		if (this.game)
 		{
 			this.game.leave(this);
@@ -47,12 +55,14 @@ module.exports = class Player extends EventEmitter {
 		}
 
 		this.game = null;
-		this.token = null;
+		this.setState('IN_LOBBY');
 	}
 
 	// disconnected
 	onDisconnected()
 	{
+		this.state = 'DISCONNECTED';
+
 		// leave current game, without triggering the 'leave_game' event
 		if (this.game)
 		{

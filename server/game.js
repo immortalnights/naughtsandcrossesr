@@ -1,10 +1,15 @@
 const uuid = require('uuid/v1');
+const EventEmitter = require('events');
 
-module.exports = class Game {
+module.exports = class Game extends EventEmitter {
 	constructor(options)
 	{
+		super();
 		this.id = uuid();
 		this.players = [];
+		this.maxPlayers = options.maxPlayers || null;
+		this.minPlayers = null;
+		this.state = 'waiting_for_players';
 
 		this.io = options.io;
 		this.onClose = options.onClose;
@@ -19,33 +24,24 @@ module.exports = class Game {
 	{
 		console.log(`Game ${this.id} has ${this.players.length} players`);
 
-		if (this.players.length < 2)
+		if (this.maxPlayers === null || players.length < this.maxPlayers)
 		{
 			this.players.push(p);
 
-			const tokens = ['x', 'o'];
-			const token = tokens[this.players.length - 1];
-
+			// add the player to the game io room
 			p.io.join(this.id);
 
 			// update the new players game data
-			p.joinedGame({ game: this, host: asHost, token });
+			p.enteredGame({ game: this });
 
 			// tell all current players that a new player has joined
-			p.io.broadcast.to(this.id).emit('player_joined', { token: p.token });
+			p.io.broadcast.to(this.id).emit('player_joined', p.serialize());
 
 			// tell the player they they have joined successfully
-			p.io.emit('joined_game', { id: this.id, host: asHost, token: p.token });
+			p.io.emit('joined_game', p.serialize());
 			console.log(`Client ${p.id} has joined game ${this.id} (${this.players.length})`);
 
-			if (this.players.length === 2)
-			{
-				console.log(`Starting game ${this.id}`);
-
-				this.turn = this.players.findIndex((player) => { return player.token === 'x'; });
-
-				this.broadcast('start_game', { cells: this.cells, turn: this.players[this.turn].token });
-			}
+			this.emit('change');
 		}
 		else
 		{
@@ -53,15 +49,22 @@ module.exports = class Game {
 		}
 	}
 
-	leave(p)
+	leave(player)
 	{
-		const index = this.players.indexOf(p);
+		const index = this.players.indexOf(player);
 		if (index !== -1)
 		{
-			console.log(`Client ${p.id} has left game ${this.id} (${this.players.length})`);
+			console.log(`Client ${player.id} has left game ${this.id} (${this.players.length})`);
 
-			this.broadcast('end_game', { reason: "Opponent has left.", winner: false });
-			this.close();
+			this.remove(player);
+
+			this.emit('change');
+
+			if (this.minPlayers !== null && this.players.length < this.minPlayers)
+			{
+				this.broadcast('end_game', { reason: "Opponents has left.", winner: false });
+				this.close();
+			}
 		}
 		else
 		{
@@ -84,6 +87,22 @@ module.exports = class Game {
 		this.close();
 	}
 
+	remove(player)
+	{
+		const index = this.players.indexOf(player);
+		if (index !== -1)
+		{
+			// take the player out of the game
+			this.players.splice(index, 1);
+
+			// remove the player the game io room
+			player.io.leave(this.id);
+
+			// notify all players that a player has left
+			this.broadcast('player_left', player.serialize());
+		}
+	}
+
 	close()
 	{
 		// kick all players
@@ -100,5 +119,4 @@ module.exports = class Game {
 	{
 		this.io.to(this.id).emit(name, msg);
 	}
-
 }

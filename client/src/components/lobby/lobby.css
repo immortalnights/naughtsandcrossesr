@@ -1,0 +1,11 @@
+
+.lobby-container {
+	max-width: 80%;
+	min-width: 800px;
+	flex: 1 1 0;
+	margin: auto;
+}
+
+.game-item .action-column {
+	flex-grow: 0;
+}
