@@ -7,8 +7,11 @@ export default class Board extends React.Component {
 		cols: 3
 	}
 
-	constructor(props) {
+	constructor(props)
+	{
 		super(props);
+
+		console.log("Board", props);
 	}
 
 	onCellClicked = (cell, event) => {

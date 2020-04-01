@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { placeToken } from '../../socketio/emits';
+import './styles.css';
 
 export default class Cell extends React.Component {
 	static propTypes = {
@@ -42,7 +43,6 @@ export default class Cell extends React.Component {
 
 	render()
 	{
-		console.log("render cell", this.props.id);
 		let className = ['cell'];
 		if (this.state.active)
 		{

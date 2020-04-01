@@ -1,50 +1,57 @@
-const http = require('http');
-const SocketIO = require('socket.io');
+const Server = require('react-matchmaking/server/server');
+const NoughtsAndCrosses = require('./noughtsandcrosses');
 
-const Lobby = require('./lobby');
-const Player = require('./player');
-const Game = require('./game');
+const s = new Server({ createGame: (options) => { return new NoughtsAndCrosses(options); }});
+s.start(3001);
 
 
-const server = http.createServer();
-const io = new SocketIO(server);
+// const http = require('http');
+// const SocketIO = require('socket.io');
 
-server.listen({
-	port: 3001,
-	host: '0.0.0.0'
-});
+// const Lobby = require('./lobby');
+// const Player = require('./player');
+// const Game = require('./game');
 
-const onCreateGame = (player) => {
-	const game = new Game({ io });
-	console.debug(`Created game ${game.id}`);
-	return game;
-}
 
-const lobby = new Lobby({ io, onCreateGame });
+// const server = http.createServer();
+// const io = new SocketIO(server);
 
-io.on('connection', (client) => {
-	console.log(`Client connected ${client.id}`);
+// server.listen({
+// 	port: 3001,
+// 	host: '0.0.0.0'
+// });
 
-	const player = new Player({ io: client });
+// const onCreateGame = (player) => {
+// 	const game = new Game({ io });
+// 	console.debug(`Created game ${game.id}`);
+// 	return game;
+// }
 
-	player.on('enter_game', () => {
-		console.debug(`Player event 'enter_game'`);
-		// remove player from lobby
-		lobby.leave(player);
-	});
+// const lobby = new Lobby({ io, onCreateGame });
 
-	player.on('leave_game', () => {
-		console.debug(`Player event 'leave_game'`);
-		// add player to lobby
-		lobby.join(player);
-	});
+// io.on('connection', (client) => {
+// 	console.log(`Client connected ${client.id}`);
 
-	player.on('disconnect', () => {
-		console.debug(`Player event 'disconnect'`);
-		// remove player from lobby
-		lobby.leave(player);
-	});
+// 	const player = new Player({ io: client });
 
-	// auto join the lobby
-	lobby.join(player);
-});
+// 	player.on('enter_game', () => {
+// 		console.debug(`Player event 'enter_game'`);
+// 		// remove player from lobby
+// 		lobby.leave(player);
+// 	});
+
+// 	player.on('leave_game', () => {
+// 		console.debug(`Player event 'leave_game'`);
+// 		// add player to lobby
+// 		lobby.join(player);
+// 	});
+
+// 	player.on('disconnect', () => {
+// 		console.debug(`Player event 'disconnect'`);
+// 		// remove player from lobby
+// 		lobby.leave(player);
+// 	});
+
+// 	// auto join the lobby
+// 	lobby.join(player);
+// });
