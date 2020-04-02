@@ -19,22 +19,16 @@ export default class Cell extends React.Component {
 		};
 	}
 
-	handleClick = () => {
-		console.log(`clicked cell ${this.props.id}`);
-		return;
-		this.props.io.send('select', {
-			id: this.props.id
-		});
-	}
-
-	handleMouseOver = () => {
+	handleMouseOver()
+	{
 		this.setState({
 			active: true
 		});
 		// console.log(`over cell ${this.props.id}`);
 	}
 
-	handleMouseLeave = () => {
+	handleMouseLeave()
+	{
 		this.setState({
 			active: false
 		});
@@ -56,10 +50,9 @@ export default class Cell extends React.Component {
 			}
 		}
 
-		const onClick = placeToken.bind(null, this.props.id);
-		// this.props.onClick ? this.props.onClick.bind(null, this) : null;
+		const onClick = this.props.onClick.bind(null, this)
 		const value = this.props.token || '&nbsp;';
 
-		return (<td className={className.join(' ')} onClick={onClick} onMouseOver={this.handleMouseOver} onMouseLeave={this.handleMouseLeave}>{this.props.t}</td>);
+		return (<td className={className.join(' ')} onClick={onClick} onMouseOver={this.handleMouseOver.bind(this)} onMouseLeave={this.handleMouseLeave.bind(this)}>{this.props.t}</td>);
 	}
 }

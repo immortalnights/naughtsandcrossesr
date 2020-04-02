@@ -14,16 +14,17 @@ export default class Board extends React.Component {
 		console.log("Board", props);
 	}
 
-	onCellClicked = (cell, event) => {
+	onCellClicked(cell, event)
+	{
 		console.log('cell clicked', this, cell, event);
-		this.props.io.send('select', {
+		this.props.emit('place_token', {
 			id: cell.props.id
 		});
 	}
 
 	render()
 	{
-		console.log("render board");
+		console.log("render board", this.props);
 
 		let rows = [];
 		for (let r = 0; r < this.props.rows; r++)
@@ -33,7 +34,7 @@ export default class Board extends React.Component {
 			{
 				let key = 1 + (r * 3) + c;
 				// row.push(<Cell key={key} id={key} token={this.props.cells[key-1]} onClick={this.onCellClicked} />);
-				row.push(<Cell key={key} {...this.props.cells[key-1]} onClick={this.onCellClicked} />);
+				row.push(<Cell key={key} id={key} {...this.props.cells[key-1]} onClick={this.onCellClicked.bind(this)} />);
 			}
 			rows.push(<tr key={r}>{row}</tr>);
 		}

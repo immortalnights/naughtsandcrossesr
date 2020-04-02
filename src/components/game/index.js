@@ -12,7 +12,7 @@ class Wrapper extends React.Component {
 	{
 		return (<>
 			<Header />
-			<Board cells={this.props.cells} />
+			<Board cells={this.props.cells} emit={this.props.emit} />
 		</>);
 	}
 }

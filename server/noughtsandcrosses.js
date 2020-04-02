@@ -9,9 +9,58 @@ module.exports = class NoughtsAndCrosses extends TurnBasedGame {
 		console.log(`NoughtsAndCrosses ${this.id} initialized`);
 	}
 
+	handleJoin(player)
+	{
+		super.handleJoin(player);
+
+		player.token = this.players.length === 1 ? 'X' : '0';
+
+		player.on('place_token', (cell) => {
+			console.log(player, player.id, cell, cell.id)
+			this.place(player, cell.id);
+		});
+	}
+
 	begin()
 	{
 		this.nextTurn();
+	}
+
+	place(player, cell)
+	{
+		console.log(`${player.id} placing ${player.token} in cell ${cell}`);
+
+		const target = this.cells[cell];
+		const activePlayer = this.whichPlayer();
+
+		if (activePlayer !== player)
+		{
+			console.log("Invalid move: Not players turn");
+			player.io.emit('invalid_move', { reason: "It is not your turn." });
+		}
+		else if (target)
+		{
+			console.log("Invalid move: Cell already taken");
+			player.io.emit('invalid_move', { reason: "Cannot place token there." });
+		}
+		else
+		{
+			this.cells[cell] = player.token;
+
+			// emit to all players
+			this.broadcast('token_placed', { cell, token: player.token });
+
+			const winner = this.checkForEndOfGame(this.cells);
+			if (winner)
+			{
+				this.end(winner);
+			}
+			else
+			{
+				this.nextTurn();
+				this.broadcast('next_turn', { turn: this.whichPlayer().token });
+			}
+		}
 	}
 
 	checkForEndOfGame(cells)
