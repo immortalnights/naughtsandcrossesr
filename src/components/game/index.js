@@ -1,5 +1,5 @@
 import React from 'react';
-// import Context from '../../socketcontext/Context';
+import { A } from 'hookrouter';
 import Board from '../../components/board';
 import Header from '../../components/header/';
 // import { leaveGame } from '../../socketio/emits';
@@ -10,9 +10,16 @@ const GameWithLoader = ReactMatchmaking.GameWithLoader;
 class Wrapper extends React.Component {
 	render()
 	{
+		let footer;
+		if (this.props.status === 'FINISHED')
+		{
+			footer = (<A href="/">Leave Game</A>);
+		}
+
 		return (<>
-			<Header />
+			<Header userId={this.props.userId} status={this.props.status} playerTurn={this.props.userId === this.props.turn} winner={this.props.winner} />
 			<Board cells={this.props.cells} emit={this.props.emit} />
+			<div>{footer}</div>
 		</>);
 	}
 }
@@ -20,9 +27,9 @@ class Wrapper extends React.Component {
 export default class Game extends React.Component {
 	render()
 	{
-		console.log(this.context);
+		console.log("wrapper", this.context, this.props, this.props.userId);
 		return (<GameWithLoader {...this.props} >
-			{(game, emit) => (<Wrapper {...game} emit={emit} />)}
+			{(game, emit) => (<Wrapper userId={this.props.userId} {...game} emit={emit} />)}
 		</GameWithLoader>);
 	}
 }

@@ -24,3 +24,15 @@ main {
 main > div {
   flex: 1 1 0;
 }
+
+h1, h2, h3 {
+  font-size: 1.75em;
+}
+
+h1, h2, h3 {
+  font-size: 1.25em;
+}
+
+h1, h2, h3 {
+  font-size: 1em;
+}

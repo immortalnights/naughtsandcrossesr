@@ -1,7 +1,8 @@
 const uuid = require('uuid/v1');
+const BasePlayer = require('react-matchmaking/server/player');
 const EventEmitter = require('events');
 
-module.exports = class Player extends EventEmitter {
+class OldPlayer extends EventEmitter {
 	constructor(options)
 	{
 		super();
@@ -71,5 +72,24 @@ module.exports = class Player extends EventEmitter {
 		}
 
 		this.emit('disconnected');
+	}
+}
+
+
+module.exports = class Player extends BasePlayer {
+	constructor({ id, token, io, ref })
+	{
+		super({ id, client: io });
+		this.token = token;
+		this.status = 'PENDING';
+		this.game = ref;
+	}
+
+	serialize()
+	{
+		const data = super.serialize();
+		data.status = this.status;
+		data.token = this.token;
+		return data;
 	}
 }

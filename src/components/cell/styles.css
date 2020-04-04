@@ -1,13 +1,12 @@
 .cell {
   width: 33%;
-  height: 33%;
   border: 1px solid gray;
   text-align: center;
-  font-size: 10em;
+  font-size: 4em;
   font-weight: lighter;
   cursor: pointer;
   text-transform: uppercase;
-  }
+}
 
 .cell.ok:hover {
   background-color: green;

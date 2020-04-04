@@ -1,5 +1,6 @@
 import React from 'react';
 import Cell from '../cell/';
+import './styles.css';
 
 export default class Board extends React.Component {
 	static defaultProps = {
@@ -34,7 +35,7 @@ export default class Board extends React.Component {
 			{
 				let key = 1 + (r * 3) + c;
 				// row.push(<Cell key={key} id={key} token={this.props.cells[key-1]} onClick={this.onCellClicked} />);
-				row.push(<Cell key={key} id={key} {...this.props.cells[key-1]} onClick={this.onCellClicked.bind(this)} />);
+				row.push(<Cell key={key} id={key-1} token={this.props.cells[key-1]} onClick={this.onCellClicked.bind(this)} />);
 			}
 			rows.push(<tr key={r}>{row}</tr>);
 		}

@@ -1,4 +1,6 @@
 const TurnBasedGame = require('react-matchmaking/server/turnbasedgame');
+const HumanPlayer = require('./humanplayer');
+const AIPlayer = require('./aiplayer');
 
 module.exports = class NoughtsAndCrosses extends TurnBasedGame {
 	constructor(options)
@@ -9,31 +11,66 @@ module.exports = class NoughtsAndCrosses extends TurnBasedGame {
 		console.log(`NoughtsAndCrosses ${this.id} initialized`);
 	}
 
+	getNewPlayerToken()
+	{
+		return ['X', '0'][this.players.length];
+	}
+
+	handleHumanJoin(playerData)
+	{
+		const player = new HumanPlayer({
+			id: playerData.id,
+			io: playerData.client,
+			token: this.getNewPlayerToken(),
+			ref: this
+		});
+
+		this.handleJoin(player);
+		return player;
+	}
+
+	handleAIJoin(player)
+	{
+		const ai = new AIPlayer({
+			id: player.id,
+			token: this.getNewPlayerToken(),
+			ref: this
+		});
+
+		this.handleJoin(ai);
+		return ai;
+	}
+
 	handleJoin(player)
 	{
 		super.handleJoin(player);
 
-		player.token = this.players.length === 1 ? 'X' : '0';
-
 		player.on('place_token', (cell) => {
-			console.log(player, player.id, cell, cell.id)
+			console.debug("place", player.id, player.id, cell, cell.id)
 			this.place(player, cell.id);
 		});
 	}
 
 	begin()
 	{
+		this.status = 'PLAYING';
 		this.nextTurn();
+		console.log("send game to all players");
+		this.broadcast('game:update', this.serialize());
 	}
 
 	place(player, cell)
 	{
-		console.log(`${player.id} placing ${player.token} in cell ${cell}`);
+		console.log(`${player.id} placing ${player.token} in cell ${cell} (${this.status})`);
 
 		const target = this.cells[cell];
 		const activePlayer = this.whichPlayer();
 
-		if (activePlayer !== player)
+		if (this.status !== 'PLAYING')
+		{
+			console.log("Invalid move: Game is not playing");
+		}
+		else if (activePlayer !== player)
 		{
 			console.log("Invalid move: Not players turn");
 			player.io.emit('invalid_move', { reason: "It is not your turn." });
@@ -48,18 +85,31 @@ module.exports = class NoughtsAndCrosses extends TurnBasedGame {
 			this.cells[cell] = player.token;
 
 			// emit to all players
-			this.broadcast('token_placed', { cell, token: player.token });
+			// this.broadcast('token_placed', { cell, token: player.token });
 
 			const winner = this.checkForEndOfGame(this.cells);
 			if (winner)
 			{
-				this.end(winner);
+				this.status = 'FINISHED';
+				this.turn = undefined;
+
+
+				let winningPlayer = this.players.find(p => p.token === winner);
+				if (winningPlayer)
+				{
+					this.winner = winningPlayer.id;
+				}
+				else
+				{
+					this.winner = '';
+				}
 			}
 			else
 			{
 				this.nextTurn();
-				this.broadcast('next_turn', { turn: this.whichPlayer().token });
 			}
+
+			this.broadcast('game:update', this.serialize());
 		}
 	}
 
@@ -143,6 +193,7 @@ module.exports = class NoughtsAndCrosses extends TurnBasedGame {
 	{
 		const data = super.serialize();
 		data.cells = this.cells;
+		data.winner = this.winner;
 		return data;
 	}
 };
