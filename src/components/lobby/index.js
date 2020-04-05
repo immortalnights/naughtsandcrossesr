@@ -7,7 +7,8 @@ const LobbyWithLoader = ReactMatchmaking.LobbyWithLoader;
 const Lobby = (props) => {
 	const handleGameStarted = (id) => {
 		navigate('/Game/' + id);
-	}
+	};
+
 	return (<LobbyWithLoader {...props} onGameReady={handleGameStarted} />)
 };
 

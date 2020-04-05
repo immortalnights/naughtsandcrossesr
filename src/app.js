@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import 'react-matchmaking/dist/index.css';
-import logo from './logo.svg';
 import { usePath, navigate, useRoutes, A } from 'hookrouter';
 import ReactMatchmaking from 'react-matchmaking';
 import Browser from './components/browser/';
 import Lobby from './components/lobby/';
 import Game from './components/game/';
-import './App.css';
+import './app.css';
 
 const GameWithLoader = ReactMatchmaking.GameWithLoader;
 
@@ -72,9 +71,9 @@ function App() {
 	}
 
 	return (
-		<div className="App">
-			<header className="App-header">
-				<h2>React-Matchmaking Noughts and Crosses</h2>
+		<div className="app">
+			<header className="header">
+				<h1>Noughts and Crosses<small>Multiplayer Matchmaking powered by React</small></h1>
 			</header>
 			<main>{content}</main>
 			<footer></footer>

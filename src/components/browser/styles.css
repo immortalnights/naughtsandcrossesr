@@ -1,0 +1,69 @@
+.lobby-list {
+	background-color: white;
+	color: black;
+	flex-grow: 1;
+	border: 1px solid darkgray;
+}
+
+.lobby-list table {
+
+}
+
+.lobby-list table thead {
+	color: #4a4a4a;
+	background-color: #f3f3f3;
+	border-bottom: 1px solid black;
+}
+
+.lobby-list tbody > tr:nth-of-type(even) {
+	background-color: #f3f3f3;
+}
+
+.lobby-list tbody > tr.active {
+	background-color: lightblue;
+}
+
+.lobby-list tbody > tr {
+	cursor: pointer;
+}
+
+
+.action-bar {
+	margin: 0 10px;
+	display: flex;
+	justify-content: space-between;
+}
+
+.action-bar button {
+	padding: 10px 20px;
+	margin: 0;
+	color: #007bff;
+	background-color: transparent; /*#007bff;*/
+	border-style: none solid solid;
+	border-width: 1px;
+	border-color: #007bff; /*darkgray;*/
+	transition: background-color .5s, color 2s;
+	font-size: .75em;
+	border-radius: 0 0 4px 4px;
+}
+
+.action-bar button[disabled] {
+	cursor: no-drop;
+	color: darkgray;
+	border-color: darkgray;
+	background-color: lightgray;
+}
+
+.action-bar button:hover:not([disabled]) {
+	cursor: pointer;
+	color: white;
+	background-color: #007bff;
+}
+
+/*
+
+.lobby-list thead {
+	background-color: gray;
+}
+
+*/

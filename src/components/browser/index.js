@@ -13,15 +13,15 @@ export default (props) => {
 		setSelection(lobby);
 	};
 
-	const handleRefreshClick = () => {
-		console.log("Refresh");
-	};
-
-	const handleJoinClick = () => {
-		if (selection)
+	const joinGame = (id) => {
+		if (id)
 		{
 			navigate('/Lobby/' + encodeURIComponent(selection.id));
 		}
+	}
+
+	const handleJoinClick = () => {
+		joinGame(selection);
 	}
 
 	const handleCreateClick = () => {
@@ -37,8 +37,8 @@ export default (props) => {
 		});
 	};
 
-	return (<div>
-		<LobbyBrowser onSelect={handleLobbySelected} />
-		<LobbyActions selection={selection} onRefreshClick={handleRefreshClick} onJoinClick={handleJoinClick} onCreateClick={handleCreateClick} />
-	</div>);
+	return (<>
+		<LobbyBrowser onSelect={handleLobbySelected} handleJoin={joinGame} />
+		<LobbyActions selection={selection} handleJoinClick={handleJoinClick} handleCreateClick={handleCreateClick} />
+	</>);
 }
