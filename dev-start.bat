@@ -1,9 +1,4 @@
 @echo off
 
-git pull
-
-cd .\client
-start npm run start
-
-cd ..\server
-start npm run dev-start
+cd C:\Users\Immortal\Projects\noughtsandcrossesr
+npm run dev

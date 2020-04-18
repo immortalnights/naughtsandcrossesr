@@ -50,6 +50,14 @@ a.btn:visited, a.btn:active {
 	text-decoration: none;
 }
 
+a.lobby-leave-button.btn {
+	color: #856404;
+	border-color: #ffeeba;
+}
+a.lobby-leave-button.btn:hover {
+	background-color: #fff3cd;
+}
+
 .action-bar button[disabled] {
 	cursor: no-drop;
 	color: darkgray;
