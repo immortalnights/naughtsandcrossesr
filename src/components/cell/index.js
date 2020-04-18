@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { placeToken } from '../../socketio/emits';
-import './styles.css';
+// import './styles.css';
 
 export default class Cell extends React.Component {
 	static propTypes = {

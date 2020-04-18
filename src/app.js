@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import 'react-matchmaking/dist/index.css';
 import { usePath, navigate, useRoutes, A } from 'hookrouter';
 import ReactMatchmaking from 'react-matchmaking';
 import Browser from './components/browser/';
@@ -71,13 +70,13 @@ function App() {
 	}
 
 	return (
-		<div className="app">
+		<>
 			<header className="header">
 				<h1>Noughts and Crosses<small>Multiplayer Matchmaking powered by React</small></h1>
 			</header>
 			<main>{content}</main>
 			<footer></footer>
-		</div>
+		</>
 	);
 }
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { navigate } from 'hookrouter';
 import ReactMatchmaking from 'react-matchmaking';
+import './styles.css';
 
 const LobbyWithLoader = ReactMatchmaking.LobbyWithLoader;
 

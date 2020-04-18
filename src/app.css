@@ -1,13 +1,80 @@
-.app {
-  text-align: center;
-  min-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+.root {
+	text-align: center;
+	min-height: 90vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	font-size: calc(10px + 2vmin);
 }
 
-.app > main {
-  margin: 10px 10px 50px;
+.root > main {
+	margin: 10px 10px 50px;
+}
+
+table {
+
+}
+
+table thead {
+	color: #4a4a4a;
+	background-color: #f3f3f3;
+	border-bottom: 1px solid black;
+}
+
+table.stripped tbody > tr:nth-of-type(even) {
+	background-color: #f3f3f3;
+}
+
+.action-bar {
+	margin: 0 10px;
+	display: flex;
+	justify-content: space-between;
+}
+
+.action-bar button , a.btn {
+	padding: 10px 20px;
+	margin: 0;
+	color: #007bff;
+	background-color: transparent; /*#007bff;*/
+	border-style: none solid solid;
+	border-width: 1px;
+	border-radius: 0 0 4px 4px;
+	transition: background-color .5s, color .5s;
+	font-size: .75em;
+	text-decoration: none;
+}
+
+a.btn:visited, a.btn:active {
+	color: #007bff;
+	text-decoration: none;
+}
+
+.action-bar button[disabled] {
+	cursor: no-drop;
+	color: darkgray;
+	border-color: darkgray;
+	background-color: lightgray;
+}
+
+.action-bar button:hover:not([disabled]), .action-bar a.btn:hover:not([disabled]) {
+	cursor: pointer;
+}
+
+.action-bar button.default {
+	border-color: darkgray;
+	color: black;
+}
+
+.action-bar button.primary:not([disabled]) {
+	border-color: #007bff; /*darkgray;*/
+}
+
+.action-bar button.primary:hover:not([disabled]) {
+	background-color: #b3c9e1;
+}
+
+.action-bar button.default:hover:not([disabled]) {
+	background-color: darkgray;
+	color: white;
 }

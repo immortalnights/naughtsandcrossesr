@@ -18,7 +18,7 @@ class Wrapper extends React.Component {
 
 		return (<>
 			<Header userId={this.props.userId} status={this.props.status} playerTurn={this.props.userId === this.props.turn} winner={this.props.winner} />
-			<Board cells={this.props.cells} emit={this.props.emit} />
+			<div className="board-wrapper {this.props.status === 'FINISHED' ? 'game-over' : ''}"><Board cells={this.props.cells} emit={this.props.emit} /></div>
 			<div>{footer}</div>
 		</>);
 	}

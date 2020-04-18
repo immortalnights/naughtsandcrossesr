@@ -1,6 +1,7 @@
 const uuid = require('uuid/v1');
 const EventEmitter = require('events');
 
+
 module.exports = class Game extends EventEmitter {
 	constructor(options)
 	{

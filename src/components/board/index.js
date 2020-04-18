@@ -11,8 +11,6 @@ export default class Board extends React.Component {
 	constructor(props)
 	{
 		super(props);
-
-		console.log("Board", props);
 	}
 
 	onCellClicked(cell, event)
