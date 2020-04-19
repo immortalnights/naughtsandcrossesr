@@ -22,32 +22,29 @@ div.players-container {
 	display: flex;
 	justify-content: space-around;
 	align-items: center;
+	margin-bottom: 15px;
 }
 
 .slot-wrapper {
 	cursor: pointer;
-	background-color: white;
-	user-select: none
-}
-
-.slot-wrapper:hover button {
-	background-color: #b3c9e1;
+	user-select: none;
 }
 
 .player-slot {
-	flex-grow: 0;
-	padding: .25em;
-	font-size: 3.5em;
-	font-family: cursive, monospace;
+	padding: .5em;
 	border: 2px solid gray;
 	border-radius: 4px;
+	background-color: white;
+	width: 115px;
 }
 
 .player-slot h2 {
 	margin: 0;
+	font-size: 3.5em;
+	font-family: cursive, monospace;
 }
 
-.player-slot button {
+.player-slot .btn {
 	padding: 10px 20px;
 	background-color: transparent;
 	color: #007bff;
@@ -58,21 +55,42 @@ div.players-container {
 	transition: background-color .5s, color .5s;
 }
 
-.player-slot button.disabled {
+.player-slot .btn.disabled {
 	color: gray;
 	border-color: gray;
 }
 
-.player-slot button:not(.disabled):hover {
+.player-slot .btn:not(.disabled):hover {
 	background-color: #b3c9e1;
 }
 
-.slot-empty {
-	color: gray;
-}
-.slot-taken {
+.slot-player-not-ready {
 	border-color: red;
 }
-.slot-local-player {
+.slot-player-ready {
 	border-color: green;
+}
+.slot-empty {
+	color: gray;
+	border-color: gray;
+}
+
+button.btn.btn-link {
+	border: none;
+	background-color: transparent;
+}
+
+.btn.btn-link:not(.disabled):hover {
+	background-color: transparent;
+	text-decoration: underline;
+}
+
+.btn:active, .btn:visted, .btn:focus {
+	border: none;
+	text-decoration: none;
+	outline: none;
+}
+
+.slot-host-controls {
+	height: 1.25em;
 }

@@ -9,45 +9,15 @@ module.exports = class NoughtsAndCrosses extends TurnBasedGame {
 	constructor(options)
 	{
 		super(options);
+		this.humanPlayerClass = HumanPlayer;
+		this.computerPlayerClass = AIPlayer;
 		this.board = new Grid(3, 3);
 
 		console.log(`NoughtsAndCrosses ${this.id} initialized`);
 	}
 
-	getNewPlayerToken()
+	onPlayerJoined(player)
 	{
-		return ['X', '0'][this.players.length];
-	}
-
-	handleHumanJoin(playerData)
-	{
-		const player = new HumanPlayer({
-			id: playerData.id,
-			io: playerData.client,
-			token: this.getNewPlayerToken(),
-			ref: this
-		});
-
-		this.handleJoin(player);
-		return player;
-	}
-
-	handleAIJoin(player)
-	{
-		const ai = new AIPlayer({
-			id: player.id,
-			token: this.getNewPlayerToken(),
-			ref: this
-		});
-
-		this.handleJoin(ai);
-		return ai;
-	}
-
-	handleJoin(player)
-	{
-		super.handleJoin(player);
-
 		player.on('place_token', (cell) => {
 			console.debug("place", player.id, player.id, cell, cell.id)
 			this.place(player, cell.id);
@@ -57,7 +27,8 @@ module.exports = class NoughtsAndCrosses extends TurnBasedGame {
 	begin()
 	{
 		this.status = 'PLAYING';
-		this.nextTurn();
+		this.players.forEach(p => console.log(p.team, p.token));
+		this.turn = this.players.findIndex(p => p.team === 'X');
 		this.broadcast('game:update', this.serialize());
 	}
 
@@ -93,9 +64,7 @@ module.exports = class NoughtsAndCrosses extends TurnBasedGame {
 				const winner = this.checkForEndOfGame();
 				if (winner)
 				{
-					this.status = 'FINISHED';
-					this.turn = undefined;
-
+					this.end();
 
 					let winningPlayer = this.players.find(p => p.token === winner);
 					if (winningPlayer)

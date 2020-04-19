@@ -77,12 +77,12 @@ class OldPlayer extends EventEmitter {
 
 
 module.exports = class Player extends BasePlayer {
-	constructor({ id, token, io, ref })
+	constructor(options)
 	{
-		super({ id, client: io });
-		this.token = token;
+		super(options);
+		this.token = options.team === 'X' ? 'X' : '0';
 		this.status = 'PENDING';
-		this.game = ref;
+		this.game = options.ref;
 	}
 
 	serialize()
