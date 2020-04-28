@@ -2,15 +2,15 @@ const TurnBasedGame = require('react-matchmaking/server/turnbasedgame');
 const _ = require('underscore');
 const HumanPlayer = require('./humanplayer');
 const AIPlayer = require('./aiplayer');
-const Grid = require('./grid');
+const Grid = require('noughtsandcrossesbattle/grid');
 
 
 module.exports = class NoughtsAndCrosses extends TurnBasedGame {
 	constructor(options)
 	{
 		super(options);
-		this.humanPlayerClass = HumanPlayer;
-		this.computerPlayerClass = AIPlayer;
+		this.initHumanPlayer = options => new HumanPlayer(options);
+		this.initComputerPlayer = options => new AIPlayer(options);
 		this.board = new Grid(3, 3);
 
 		console.log(`NoughtsAndCrosses ${this.id} initialized`);

@@ -82,7 +82,7 @@ module.exports = class Player extends BasePlayer {
 		super(options);
 		this.token = options.team === 'X' ? 'X' : '0';
 		this.status = 'PENDING';
-		this.game = options.ref;
+		this.game = options.game;
 	}
 
 	serialize()
