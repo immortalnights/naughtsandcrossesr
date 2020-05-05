@@ -8,14 +8,9 @@ export default class Board extends React.Component {
 		cols: 3
 	}
 
-	constructor(props)
-	{
-		super(props);
-	}
-
 	onCellClicked(cell, event)
 	{
-		console.log('cell clicked', this, cell, event);
+		console.debug('cell clicked', this, cell, event);
 		this.props.emit('place_token', {
 			id: cell.props.id
 		});
@@ -25,17 +20,19 @@ export default class Board extends React.Component {
 	{
 		console.log("render board", this.props);
 
-		let rows = [];
+		const height = (100 / this.props.rows).toFixed(0) + '%';
+		const width = (100 / this.props.cols).toFixed(0) + '%';
+
+		const rows = [];
 		for (let r = 0; r < this.props.rows; r++)
 		{
-			let row = [];
+			const row = [];
 			for (let c = 0; c < this.props.cols; c++)
 			{
-				let key = 1 + (r * 3) + c;
-				// row.push(<Cell key={key} id={key} token={this.props.cells[key-1]} onClick={this.onCellClicked} />);
-				row.push(<Cell key={key} id={key-1} token={this.props.cells[key-1]} onClick={this.onCellClicked.bind(this)} />);
+				const key = 1 + (r * 3) + c;
+				row.push(<Cell key={key} id={key-1} token={this.props.cells[key-1]} width={width} onClick={this.onCellClicked.bind(this)} />);
 			}
-			rows.push(<tr key={r}>{row}</tr>);
+			rows.push(<tr style={{height}} key={r}>{row}</tr>);
 		}
 
 		return (<table className="board"><tbody>{rows}</tbody></table>);

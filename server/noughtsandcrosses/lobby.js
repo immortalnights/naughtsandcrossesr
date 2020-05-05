@@ -1,6 +1,6 @@
-const Lobby = require('react-matchmaking/server/lobby');
-const { TeamFlags } = require('react-matchmaking/server/common');
 const _ = require('underscore');
+const Lobby = require('multiplayer-game-server/lobby');
+const { TeamFlags } = require('multiplayer-game-server/common');
 
 module.exports = class NoughtsAndCrossesLobby extends Lobby {
 	constructor(options)

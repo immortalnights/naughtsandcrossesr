@@ -1,5 +1,5 @@
 const uuid = require('uuid/v1');
-const BasePlayer = require('react-matchmaking/server/player');
+const BasePlayer = require('multiplayer-game-server/player');
 const EventEmitter = require('events');
 
 class OldPlayer extends EventEmitter {

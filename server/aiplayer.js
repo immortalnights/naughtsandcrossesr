@@ -25,7 +25,7 @@ class AIPlayer extends Player {
 		super(options);
 		this.io = new AIEventIO();
 		this.difficultly = options.difficultly;
-		this.brain = Brains[options.difficultly] ? new Brains[difficultly] : new Brains['learning'];
+		this.brain = Brains[options.difficultly] ? new Brains[difficultly](this, {}) : new Brains['learning'](this, {});
 		this.artifical = true;
 
 		console.log(`Initialized AI Player ${this.id} ${this.difficultly} ${Brains}`);

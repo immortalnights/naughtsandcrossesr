@@ -1,19 +1,20 @@
-const TurnBasedGame = require('react-matchmaking/server/turnbasedgame');
 const _ = require('underscore');
-const HumanPlayer = require('./humanplayer');
-const AIPlayer = require('./aiplayer');
-const Grid = require('noughtsandcrossesbattle/grid');
+const TurnBasedGame = require('multiplayer-game-server/turnbasedgame');
+const Grid = require('multiplayer-game-server/grid');
+const ConnectFourGame = require('connectfour-ai-arena/game');
+const HumanPlayer = require('../humanplayer');
+const AIPlayer = require('../aiplayer');
 
 
-module.exports = class NoughtsAndCrosses extends TurnBasedGame {
+class ConnectFour extends TurnBasedGame {
 	constructor(options)
 	{
 		super(options);
 		this.initHumanPlayer = options => new HumanPlayer(options);
 		this.initComputerPlayer = options => new AIPlayer(options);
-		this.board = new Grid(3, 3);
+		this.board = new Grid(7, 6);
 
-		console.log(`NoughtsAndCrosses ${this.id} initialized`);
+		console.log(`ConnectFour ${this.id} initialized`);
 	}
 
 	onPlayerJoined(player)
@@ -122,8 +123,13 @@ module.exports = class NoughtsAndCrosses extends TurnBasedGame {
 	serialize()
 	{
 		const data = super.serialize();
+		data.board = { w: this.board.width, h: this.board.height };
 		data.cells = this.board.toArray();
 		data.winner = this.winner;
 		return data;
 	}
 };
+
+ConnectFour.prototype.checkForEndOfGame = ConnectFourGame.prototype.checkForEndOfGame;
+
+module.exports = ConnectFour;

@@ -72,7 +72,7 @@ function App() {
 	return (
 		<>
 			<header className="header">
-				<h1>Noughts and Crosses<small>Multiplayer Matchmaking powered by React</small></h1>
+				<h1>Multiplayer Matchmaking<small>powered by React</small></h1>
 			</header>
 			<main>{content}</main>
 			<footer></footer>

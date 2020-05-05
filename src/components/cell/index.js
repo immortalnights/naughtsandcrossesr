@@ -9,7 +9,7 @@ export default class Cell extends React.Component {
 	constructor(props) {
 		super(props);
 
-		console.log("CELL", props);
+		// console.debug("CELL", props);
 
 		this.state = {
 			active: false,
@@ -35,7 +35,7 @@ export default class Cell extends React.Component {
 
 	render()
 	{
-		console.log("render cell", this.props);
+		console.debug("render cell", this.props);
 
 		let className = ['cell'];
 		if (this.state.active)
@@ -53,6 +53,6 @@ export default class Cell extends React.Component {
 		const onClick = this.props.onClick.bind(null, this)
 		const value = this.props.token || '&nbsp;';
 
-		return (<td className={className.join(' ')} onClick={onClick} onMouseOver={this.handleMouseOver.bind(this)} onMouseLeave={this.handleMouseLeave.bind(this)}>{this.props.token}</td>);
+		return (<td className={className.join(' ')} style={{ width: this.props.width }} onClick={onClick} onMouseOver={this.handleMouseOver.bind(this)} onMouseLeave={this.handleMouseLeave.bind(this)}>{this.props.token}</td>);
 	}
 }
