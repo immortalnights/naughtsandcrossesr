@@ -4,9 +4,8 @@ import Board from '../../components/board';
 import Header from '../../components/header/';
 // import { leaveGame } from '../../socketio/emits';
 import ReactMatchmaking from 'react-matchmaking';
-import { GameWithLoader } from 'react-matchmaking';
 
-// const GameWithLoader = ReactMatchmaking.GameWithLoader;
+const GameWithLoader = ReactMatchmaking.GameWithLoader;
 
 class Wrapper extends React.Component {
 	render()

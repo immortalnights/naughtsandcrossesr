@@ -50,8 +50,8 @@ module.exports = class NoughtsAndCrosses extends TurnBasedGame {
 		else
 		{
 			const location = {
-				x: cell % 3,
-				y: Math.floor(cell / 3)
+				x: cell % this.board.width,
+				y: Math.floor(cell / this.board.height)
 			};
 
 			if (this.board.place(location, player.token) === false)
