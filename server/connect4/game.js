@@ -12,6 +12,7 @@ class ConnectFour extends TurnBasedGame {
 		super(options);
 		this.initHumanPlayer = options => new HumanPlayer(options);
 		this.initComputerPlayer = options => new AIPlayer(options);
+		this.type = 'connectfour';
 		this.board = new Grid(7, 6);
 
 		console.log(`ConnectFour ${this.id} initialized`);
@@ -19,6 +20,15 @@ class ConnectFour extends TurnBasedGame {
 
 	onPlayerJoined(player)
 	{
+		if (player.token === 'X')
+		{
+			player.token = 'red';
+		}
+		else
+		{
+			player.token = 'yellow';
+		}
+
 		player.on('place_token', (cell) => {
 			console.debug("place", player.id, player.id, cell, cell.id)
 			this.place(player, cell.id);
@@ -50,12 +60,41 @@ class ConnectFour extends TurnBasedGame {
 		}
 		else
 		{
-			const location = {
-				x: cell % 3,
-				y: Math.floor(cell / 3)
+			const placeToken = (cell, token) => {
+				const location = {
+					x: cell % this.board.width,
+					y: 0
+				};
+				console.log(`cell ${cell} to x ${location.x}`)
+
+				let ok;
+
+				// drop placement down Y
+				const testLocation = { x: location.x, y: 0 };
+				if (this.board.at(testLocation) !== '')
+				{
+					this.board.display();
+					console.error(`Failed to place token at ${testLocation.x}, ${testLocation.y}: Column is full`);
+					console.error(`Board: '${this.board.serialize()}'`);
+				}
+				else
+				{
+					for (let y = this.board.height - 1; y >= 0 && !ok; y--)
+					{
+						const dropLocation = { x: location.x, y };
+						console.debug("drop", dropLocation);
+						if (this.board.at(dropLocation) === '')
+						{
+							ok = this.board.place(dropLocation, token);
+						}
+					}
+				}
+
+				return ok;
 			};
 
-			if (this.board.place(location, player.token) === false)
+
+			if (placeToken(cell, player.token) === false)
 			{
 				console.log("Invalid move: Cell already taken");
 				player.io.emit('invalid_move', { reason: "Cannot place token there." });
@@ -95,7 +134,7 @@ class ConnectFour extends TurnBasedGame {
 
 		let winner = null;
 
-		const paths = board.paths(3);
+		const paths = board.paths(4);
 		const winPath = paths.find(path => {
 			// Use the first token to match against the rest
 			const token = path[0].token;
@@ -122,10 +161,12 @@ class ConnectFour extends TurnBasedGame {
 
 	serialize()
 	{
-		const data = super.serialize();
-		data.board = { w: this.board.width, h: this.board.height };
-		data.cells = this.board.toArray();
-		data.winner = this.winner;
+		const data = { ...super.serialize(),
+			type: this.type,
+			board: { w: this.board.width, h: this.board.height },
+			cells: this.board.toArray(),
+			winner: this.winner
+		};
 		return data;
 	}
 };

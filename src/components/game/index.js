@@ -10,9 +10,22 @@ const GameWithLoader = ReactMatchmaking.GameWithLoader;
 class Wrapper extends React.Component {
 	render()
 	{
+		const { status, userId, winner, cells, board, emit } = this.props;
+		const playerTurn = userId === this.props.turn;
+		console.log("Render wrapper", this.props);
+
+		const wrapperClass = ['board-wrapper'];
+
+		if (this.props.status === 'FINISHED')
+		{
+			wrapperClass.push('game-over');
+		}
+
 		return (<>
-			<Header userId={this.props.userId} status={this.props.status} playerTurn={this.props.userId === this.props.turn} winner={this.props.winner} />
-			<div className="board-wrapper {this.props.status === 'FINISHED' ? 'game-over' : ''}"><Board cells={this.props.cells} cols={this.props.board.w} rows={this.props.board.h} emit={this.props.emit} /></div>
+			<Header userId={userId} status={status} playerTurn={playerTurn} winner={winner} />
+			<div className={wrapperClass.join(' ')}>
+				<Board game={this.props.type} cells={cells} cols={board.w} rows={board.h} emit={emit} />
+			</div>
 			<div><A href="/">Leave Game</A></div>
 		</>);
 	}

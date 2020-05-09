@@ -11,6 +11,7 @@ module.exports = class NoughtsAndCrosses extends TurnBasedGame {
 		super(options);
 		this.initHumanPlayer = options => new HumanPlayer(options);
 		this.initComputerPlayer = options => new AIPlayer(options);
+		this.type = 'noughtsandcrosses';
 		this.board = new Grid(3, 3);
 
 		console.log(`NoughtsAndCrosses ${this.id} initialized`);
